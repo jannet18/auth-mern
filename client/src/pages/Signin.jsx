@@ -1,21 +1,28 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  signInFailure,
+  signInStart,
+  signInSuccess,
+} from "../redux/user/userSlice";
 
 function Signup() {
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const { loading, error } = useSelector((state) => state.user);
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
-  // console.log(formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      setTimeout(setLoading(true), 5000);
-      setError(false);
+      dispatch(signInStart());
       const response = await fetch("/api/auth/sign-in", {
         method: "POST",
         headers: {
@@ -24,31 +31,23 @@ function Signup() {
         },
         body: JSON.stringify(formData),
       });
+
       const data = await response.json();
-      setLoading(false);
       if (data.success === false) {
-        setError(true);
+        dispatch(signInFailure(data));
         return;
       }
-      // console.log(data);
+      dispatch(signInSuccess(data));
       navigate("/");
     } catch (error) {
-      setLoading(false);
-      setError(true);
+      dispatch(signInFailure(error));
     }
   };
 
   return (
     <div className="p-4 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
-      <form action="" onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* <input
-          type="text"
-          placeholder="Username"
-          id="username"
-          className="bg-slate-100 p-3 rounded-lg"
-          onChange={handleChange}
-        /> */}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="text"
           placeholder="Email"
@@ -64,7 +63,6 @@ function Signup() {
           onChange={handleChange}
         />
         <button
-          // type="submit"
           disabled={loading}
           className="bg-slate-700 text-white uppercase rounded-lg p-3 hover:opacity-95 disabled:opacity-80"
         >
@@ -77,7 +75,9 @@ function Signup() {
           <span className="text-blue-500">Sign Up</span>
         </Link>
       </div>
-      <p className="mt-5 text-red-600">{error && "Something went wrong!"}</p>
+      <p className="mt-5 text-red-600">
+        {error ? error.message || "Something went wrong!" : ""}
+      </p>
     </div>
   );
 }

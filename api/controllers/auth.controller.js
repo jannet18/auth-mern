@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 // import pkg from "bcryptjs";
 import bcryptjs from "bcryptjs";
-import errorHandler from "../utils/error.js";
+import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 // const { compareSync } = pkg;
 export const signup = async (req, res, next) => {
