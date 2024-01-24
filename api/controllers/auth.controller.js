@@ -68,9 +68,9 @@ export const google = async (req, res, next) => {
       const newUser = new User({
         // generate user details
         username:
-          req.body.name.split(" ").join("").toLowercase() +
-          // Math.floor(Math.random() * 10000).toString(),
-          Math.random().toString(36).slice(-8),
+          req.body.name?.split(" ")?.join("")?.toLowerCase() +
+          Math.floor(Math.random() * 10000).toString(),
+        // Math.random().toString(36).slice(-8),
         email: req.body.email,
         password: hashedPassword,
         photo: req.body.photo,
@@ -78,7 +78,7 @@ export const google = async (req, res, next) => {
       // save user to database
       await newUser.save();
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
-      const { password: hashedPassword2, ...rest } = newUser.doc;
+      const { password: hashedPassword2, ...rest } = newUser._doc;
       const expiryDate = new Date(Date.now() + 3600000);
       res
         .cookie("access_token", token, { httpOnly: true, expiryDate })
