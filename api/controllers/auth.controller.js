@@ -1,5 +1,5 @@
 import User from "../models/user.model.js";
-import bcryptjs, { hashSync } from "bcryptjs";
+import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
@@ -68,9 +68,9 @@ export const google = async (req, res, next) => {
       const newUser = new User({
         // generate user details
         username:
-          req.body.name.split(" ").jion("").toLowercase() +
-          Math.floor(Math.random() * 10000).toString(),
-        // Math.random().toString(36).slice(-8);
+          req.body.name.split(" ").join("").toLowercase() +
+          // Math.floor(Math.random() * 10000).toString(),
+          Math.random().toString(36).slice(-8),
         email: req.body.email,
         password: hashedPassword,
         photo: req.body.photo,
