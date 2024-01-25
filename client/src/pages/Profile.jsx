@@ -13,11 +13,19 @@ import {
   updateUserStart,
   updateUserSuccess,
 } from "../redux/user/userSlice.js";
+import {
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+} from "../redux/user/userSlice.js";
+import { useNavigate } from "react-router-dom";
+import { signOut } from "../redux/user/userSlice.js";
 
 function Profile() {
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const fileRef = useRef(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [image, setImage] = useState(undefined);
   const [imagePercentage, setImagePercentage] = useState(0);
   const [imageError, setImageError] = useState(false);
@@ -92,6 +100,31 @@ function Profile() {
       dispatch(updateUserFailure(error));
     }
   };
+
+  const handleDeleteAccount = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+      navigate("/sign-in");
+    } catch (error) {
+      dispatch(deleteUserFailure(error));
+    }
+  };
+
+  const handleSignout = async () => {
+    try {
+      await fetch("/api/auth/signout");
+      dispatch(signOut());
+    } catch (error) {}
+  };
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -153,10 +186,18 @@ function Profile() {
         </button>
       </form>
       <div className="flex flex-row justify-between mt-4">
-        <span className="text-red-700 cursor-pointer  capitalize">
+        <span
+          className="text-red-700 cursor-pointer  capitalize"
+          onClick={handleDeleteAccount}
+        >
           Delete Account
         </span>
-        <span className="text-red-700 cursor-pointer capitalize">Sign Out</span>
+        <span
+          className="text-red-700 cursor-pointer capitalize"
+          onClick={handleSignout}
+        >
+          Sign Out
+        </span>
       </div>
       <p className="text-red-700 mt-5">{error && "Something went wrong!"}</p>
       <p className="text-green-700 mt-5">
