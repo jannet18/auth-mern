@@ -28,9 +28,7 @@ export const updateUser = async (req, res, next) => {
           profilePicture: req.body.profilePicture,
         },
       },
-      {
-        new: true,
-      }
+      { new: true }
     );
 
     // send user to the client side
