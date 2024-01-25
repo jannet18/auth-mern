@@ -123,6 +123,7 @@ function Profile() {
     try {
       await fetch("/api/auth/signout");
       dispatch(signOut());
+      navigate("/sign-in");
     } catch (error) {}
   };
   return (
